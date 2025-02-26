@@ -5,23 +5,19 @@ format: html
 editor: visual
 ---
 
-## Quarto
-
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
-
-## Running Code
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
 ```{r}
-1 + 1
+library(haven)
+
+# Load Stata file
+crop_pest <- read_dta("data/41893_2020_637_MOESM3_ESM.dta")
+
+# Save as CSV
+write.csv(df, "crop_pest.csv", row.names = FALSE)
+
+cat("Conversion complete: crop_pest.csv\n")
+```
+```{r}
+head(crop_pest)
 ```
 
-You can add options to executable code like this
 
-```{r}
-#| echo: false
-2 * 2
-```
-
-The `echo: false` option disables the printing of code (only output is displayed).
