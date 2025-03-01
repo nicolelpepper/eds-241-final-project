@@ -3,21 +3,57 @@ title: "Final Project"
 author: "Nicole, Eva, and Stephen"
 format: html
 editor: visual
+editor_options: 
+  chunk_output_type: console
 ---
 
+
 ```{r}
+# ---- Load libraries ---- 
 library(haven)
+library(dplyr)
+library(tidyverse)
+library(fixest)
+library(spatialreg)
+library(ggplot2)
+library(spdep)
+
+
+```
+
+
+```{r}
+# ---- Read in project data ----
 
 # Load Stata file
-crop_pest <- read_dta("data/41893_2020_637_MOESM3_ESM.dta")
+data <- read_dta("data/41893_2020_637_MOESM3_ESM.dta")
 
 # Save as CSV
 write.csv(df, "crop_pest.csv", row.names = FALSE)
 
 cat("Conversion complete: crop_pest.csv\n")
 ```
+
 ```{r}
 head(crop_pest)
 ```
 
+```{r}
+# Define spatial regression function
+spatial_hac_model <- function(formula, data, lat, lon, time, dist=2.5, lag=0) {
+  # Assuming spatial weights matrix (W) is precomputed; use `spdep` if needed
+  coords <- data[, c(lat, lon)]
+  W <- knearneigh(coords, k=5) |>
+      knn2nb() |>
+      nb2listw()
+  model <- lagsarlm(formula, data = data, listw = W)
+  return(model)
+}
 
+
+# Run main model
+model_hac <- spatial_hac_model(IHSInsectperHaA ~ IHSAgHaNearTempA + IHSSimpsDivNearTempA + IHSHaPrmtA, 
+                               data, "centroid_y", "centroid_x", "year")
+
+
+```
